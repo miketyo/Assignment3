@@ -149,6 +149,17 @@ public class ReadFile
         
         return suppliers;
     }
+     private int calculateAge(String dob)
+    {
+        LocalDate parseDob = LocalDate.parse(dob); 
+        int dobYear  = parseDob.getYear();
+        
+        ZonedDateTime todayDate = ZonedDateTime.now();
+        int currentYear = todayDate.getYear();
+        
+        
+        return currentYear - dobYear;
+    }
     private void writeCustomerOutFile()
     {
         String str = "======================= CUSTOMERS =========================\n";
@@ -199,19 +210,7 @@ public class ReadFile
         
         return parseDob.format(formatter);
     }
-    
-    private int calculateAge(String dob)
-    {
-        LocalDate parseDob = LocalDate.parse(dob); 
-        int dobYear  = parseDob.getYear();
-        
-        ZonedDateTime todayDate = ZonedDateTime.now();
-        int currentYear = todayDate.getYear();
-        
-        
-        return currentYear - dobYear;
-    }
-    
+
     private int canRent()
     {
         int canRent = 0;
