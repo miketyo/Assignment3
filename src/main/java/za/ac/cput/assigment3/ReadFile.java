@@ -42,7 +42,7 @@ public class ReadFile
         {
             fWriter = new FileWriter(new File(filename));
             pWriter = new PrintWriter(fWriter);
-            System.out.println(filename + " created");
+            System.out.println(filename + " is created");
             
         } catch (IOException ioe)
         {
@@ -60,7 +60,7 @@ public class ReadFile
             file = new FileInputStream(new File(stakeholderOut));
             object = new ObjectInputStream(file);
             
-            // throws an EOFException 
+            
             while (true)
             {
                 Object obj = object.readObject();
@@ -153,6 +153,7 @@ public class ReadFile
         return suppliers;
     }
     
+    
     private void writeCustomerOutFile()
     {
         String stri = "======================= CUSTOMERS =========================\n";
@@ -190,7 +191,30 @@ public class ReadFile
         {
         }
     }
+    private String formatDate(String dob)
+    {
+        
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(
+                "dd MMM yyyy", 
+                Locale.ENGLISH);
+
+        LocalDate parseDob = LocalDate.parse(dob); 
+
+        
+        return parseDob.format(formatter);
+    }
     
+    private int calculateAge(String dob)
+    {
+        LocalDate parseDob = LocalDate.parse(dob); 
+        int dobYear  = parseDob.getYear();
+        
+        ZonedDateTime todayDate = ZonedDateTime.now();
+        int currentYear = todayDate.getYear();
+        
+        
+        return currentYear - dobYear;
+    }
      private void writeSupplierOutFile()
     {
         String su = "======================= SUPPLIERS =========================\n";
@@ -231,30 +255,7 @@ public class ReadFile
         {
         }
     }
-    private String formatDate(String dob)
-    {
-        
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(
-                "dd MMM yyyy", 
-                Locale.ENGLISH);
-
-        LocalDate parseDob = LocalDate.parse(dob); 
-
-        
-        return parseDob.format(formatter);
-    }
     
-    private int calculateAge(String dob)
-    {
-        LocalDate parseDob = LocalDate.parse(dob); 
-        int dobYear  = parseDob.getYear();
-        
-        ZonedDateTime todayDate = ZonedDateTime.now();
-        int currentYear = todayDate.getYear();
-        
-        
-        return currentYear - dobYear;
-    }
     
     private int canRent()
     {
