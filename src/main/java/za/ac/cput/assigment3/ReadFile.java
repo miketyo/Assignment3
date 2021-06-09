@@ -40,6 +40,7 @@ public class ReadFile
             fWriter = new FileWriter(new File(filename));
             pWriter = new PrintWriter(fWriter);
             
+            
         } catch (IOException ioe)
         {
             System.out.println(filename + " has been created");
@@ -59,11 +60,11 @@ public class ReadFile
             
             while (true)
             {
-                Object cus = object.readObject();
+                Object ject = object.readObject();
                 
-                if (cus instanceof Customer)
+                if (ject instanceof Customer)
                 {
-                    customers.add((Customer) cus);
+                    customers.add((Customer) ject);
                 }
             }
             
@@ -91,31 +92,80 @@ public class ReadFile
         {
             
             Collections.sort(customers,
-                    (Customer c1, Customer c2) -> 
-                            c1.getStHolderId().compareTo(c2.getStHolderId())
+                    (Customer cus1, Customer cus2) -> 
+                            cus1.getStHolderId().compareTo(cus2.getStHolderId())
             );
         }
         
         return customers;
     }
-    
+     private ArrayList<Supplier> suppliersList()
+    {
+        ArrayList<Supplier> suppliers = new ArrayList<>();
+        
+        try
+        {
+            input = new FileInputStream(new File(stakeholderOut));
+            object = new ObjectInputStream(input);
+            
+            
+            while (true)
+            {
+                Object obj = object.readObject();
+                
+                if (obj instanceof Supplier)
+                {
+                    suppliers.add((Supplier) obj);
+                }
+            }
+            
+        } catch (EOFException eofe)
+        {
+            
+        } catch (IOException | ClassNotFoundException e)
+        {
+        } finally
+        {
+            try
+            {
+                input.close();
+                object.close();
+                
+            } catch (IOException e)
+            {
+            }
+        }
+        
+      
+        if (!suppliers.isEmpty())
+        {
+            
+            Collections.sort(
+                    suppliers, 
+                    (Supplier s1, Supplier s2) -> 
+                            s1.getName().compareTo(s2.getName())
+            );
+        }
+        
+        return suppliers;
+    }
     private void writeCustomerOutFile()
     {
-        String header = "======================= CUSTOMERS =========================\n";
-        String placeholder = "%s\t%-10s\t%-10s\t%-10s\t%-10s\n";
-        String separator = "===========================================================\n";
+        String str = "======================= CUSTOMERS =========================\n";
+        String sep = "%s\t%-10s\t%-10s\t%-10s\t%-10s\n";
+        String st = "===========================================================\n";
         
         try
         {   
-            pWriter.print(header);
-            pWriter.printf(placeholder, "ID", "Name", "Surname", 
+            pWriter.print(str);
+            pWriter.printf(sep, "ID", "Name", "Surname", 
                     "Date Of Birth", "Age");
-            pWriter.print(separator);
+            pWriter.print(st);
             
             for (int i = 0; i < customersList().size(); i++)
             {   
                 pWriter.printf(
-                        placeholder,
+                        sep,
                         customersList().get(i).getStHolderId(),
                         customersList().get(i).getFirstName(),
                         customersList().get(i).getSurName(),
@@ -192,59 +242,7 @@ public class ReadFile
         }
         return canNotRent;
     }
-    
-    
-    private ArrayList<Supplier> suppliersList()
-    {
-        ArrayList<Supplier> suppliers = new ArrayList<>();
-        
-        try
-        {
-            input = new FileInputStream(new File(stakeholderOut));
-            object = new ObjectInputStream(input);
-            
-            
-            while (true)
-            {
-                Object obj = object.readObject();
-                
-                if (obj instanceof Supplier)
-                {
-                    suppliers.add((Supplier) obj);
-                }
-            }
-            
-        } catch (EOFException eofe)
-        {
-            
-        } catch (IOException | ClassNotFoundException e)
-        {
-        } finally
-        {
-            try
-            {
-                input.close();
-                object.close();
-                
-            } catch (IOException e)
-            {
-            }
-        }
-        
-      
-        if (!suppliers.isEmpty())
-        {
-            
-            Collections.sort(
-                    suppliers, 
-                    (Supplier s1, Supplier s2) -> 
-                            s1.getName().compareTo(s2.getName())
-            );
-        }
-        
-        return suppliers;
-    }
-    
+       
     private void writeSupplierOutFile()
     {
         String header = "======================= SUPPLIERS =========================\n";
