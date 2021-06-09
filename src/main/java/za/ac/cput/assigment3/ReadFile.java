@@ -27,11 +27,14 @@ import java.util.Locale;
 public class ReadFile 
 {
     private final String stakeholderOut = "stakeholder.ser";
-
-    FileInputStream input;
-    ObjectInputStream object;
+    
+    
     FileWriter fWriter;
     PrintWriter pWriter;
+    
+   
+    FileInputStream file;
+    ObjectInputStream object;
     
     public void openFile(String filename)
     {
@@ -39,11 +42,10 @@ public class ReadFile
         {
             fWriter = new FileWriter(new File(filename));
             pWriter = new PrintWriter(fWriter);
-            
+            System.out.println(filename + " created");
             
         } catch (IOException ioe)
         {
-            System.out.println(filename + " has been created");
             System.exit(1);
         }
     }
@@ -55,16 +57,17 @@ public class ReadFile
         
         try
         {
-            input = new FileInputStream(new File(stakeholderOut));
-            object = new ObjectInputStream(object);
+            file = new FileInputStream(new File(stakeholderOut));
+            object = new ObjectInputStream(file);
             
+            // throws an EOFException 
             while (true)
             {
-                Object ject = object.readObject();
+                Object obj = object.readObject();
                 
-                if (ject instanceof Customer)
+                if (obj instanceof Customer)
                 {
-                    customers.add((Customer) ject);
+                    customers.add((Customer) obj);
                 }
             }
             
@@ -79,7 +82,7 @@ public class ReadFile
         {
             try
             {
-                input.close();
+                file.close();
                 object.close();
                 
             } catch (IOException e)
@@ -92,21 +95,21 @@ public class ReadFile
         {
             
             Collections.sort(customers,
-                    (Customer cus1, Customer cus2) -> 
-                            cus1.getStHolderId().compareTo(cus2.getStHolderId())
+                    (Customer c1, Customer c2) -> 
+                            c1.getStHolderId().compareTo(c2.getStHolderId())
             );
         }
         
         return customers;
     }
-     private ArrayList<Supplier> suppliersList()
+    private ArrayList<Supplier> suppliersList()
     {
         ArrayList<Supplier> suppliers = new ArrayList<>();
         
         try
         {
-            input = new FileInputStream(new File(stakeholderOut));
-            object = new ObjectInputStream(input);
+            file = new FileInputStream(new File(stakeholderOut));
+            object = new ObjectInputStream(file);
             
             
             while (true)
@@ -128,7 +131,7 @@ public class ReadFile
         {
             try
             {
-                input.close();
+                file.close();
                 object.close();
                 
             } catch (IOException e)
@@ -149,34 +152,24 @@ public class ReadFile
         
         return suppliers;
     }
-     private int calculateAge(String dob)
-    {
-        LocalDate parseDob = LocalDate.parse(dob); 
-        int dobYear  = parseDob.getYear();
-        
-        ZonedDateTime todayDate = ZonedDateTime.now();
-        int currentYear = todayDate.getYear();
-        
-        
-        return currentYear - dobYear;
-    }
+    
     private void writeCustomerOutFile()
     {
-        String str = "======================= CUSTOMERS =========================\n";
-        String sep = "%s\t%-10s\t%-10s\t%-10s\t%-10s\n";
+        String stri = "======================= CUSTOMERS =========================\n";
+        String str = "%s\t%-10s\t%-10s\t%-10s\t%-10s\n";
         String st = "===========================================================\n";
         
         try
         {   
-            pWriter.print(str);
-            pWriter.printf(sep, "ID", "Name", "Surname", 
+            pWriter.print(stri);
+            pWriter.printf(str, "ID", "Name", "Surname", 
                     "Date Of Birth", "Age");
             pWriter.print(st);
             
             for (int i = 0; i < customersList().size(); i++)
             {   
                 pWriter.printf(
-                        sep,
+                        str,
                         customersList().get(i).getStHolderId(),
                         customersList().get(i).getFirstName(),
                         customersList().get(i).getSurName(),
@@ -198,6 +191,46 @@ public class ReadFile
         }
     }
     
+     private void writeSupplierOutFile()
+    {
+        String su = "======================= SUPPLIERS =========================\n";
+        String sup = "%s\t%-20s\t%-10s\t%-10s\n";
+        String sul = "===========================================================\n";
+        
+        try
+        {
+            pWriter.print(su);
+            pWriter.printf(sup, "ID", "Name", "Prod Type",
+                "Description");
+            pWriter.print(sul);
+            for (int i = 0; i < suppliersList().size(); i++)
+            {
+                pWriter.printf(
+                        sup,
+                        suppliersList().get(i).getStHolderId(),
+                        suppliersList().get(i).getName(),
+                        suppliersList().get(i).getProductType(),
+                        suppliersList().get(i).getProductDescription()
+                );
+            }
+            
+        } catch (Exception e)
+        {
+        }
+    }
+    
+    public void closeFile(String filename)
+    {
+        try
+        {
+            fWriter.close();
+            pWriter.close();
+            System.out.println(filename + " is closed");
+
+        } catch (IOException ex)
+        {
+        }
+    }
     private String formatDate(String dob)
     {
         
@@ -210,7 +243,19 @@ public class ReadFile
         
         return parseDob.format(formatter);
     }
-
+    
+    private int calculateAge(String dob)
+    {
+        LocalDate parseDob = LocalDate.parse(dob); 
+        int dobYear  = parseDob.getYear();
+        
+        ZonedDateTime todayDate = ZonedDateTime.now();
+        int currentYear = todayDate.getYear();
+        
+        
+        return currentYear - dobYear;
+    }
+    
     private int canRent()
     {
         int canRent = 0;
@@ -241,50 +286,7 @@ public class ReadFile
         }
         return canNotRent;
     }
-       
-    private void writeSupplierOutFile()
-    {
-        String header = "======================= SUPPLIERS =========================\n";
-        String placeholder = "%s\t%-20s\t%-10s\t%-10s\n";
-        String separator = "===========================================================\n";
-        
-        try
-        {
-            pWriter.print(header);
-            pWriter.printf(placeholder, "ID", "Name", "Prod Type",
-                "Description");
-            pWriter.print(separator);
-            for (int i = 0; i < suppliersList().size(); i++)
-            {
-                pWriter.printf(
-                        placeholder,
-                        suppliersList().get(i).getStHolderId(),
-                        suppliersList().get(i).getName(),
-                        suppliersList().get(i).getProductType(),
-                        suppliersList().get(i).getProductDescription()
-                );
-            }
-            
-        } catch (Exception e)
-        {
-        }
-    }
-    
-    public void closeFile(String filename)
-    {
-        try
-        {
-            fWriter.close();
-            pWriter.close();
-           
-
-        } catch (IOException ex)
-        {
-             System.out.println(filename + " has been closed");
-        }
-    }
-    
-    
+   
     public static void main(String[] args)
     {
         ReadFile rf = new ReadFile();
